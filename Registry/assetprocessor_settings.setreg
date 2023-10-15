@@ -1,0 +1,18 @@
+{
+    "Amazon": {
+        "AssetProcessor": {
+            "Settings": {
+                "ScanFolder TimeDistortion/Assets": {
+                    "watch": "@GEMROOT:TimeDistortion@/Assets",
+                    "recursive": 1,
+                    "order": 101
+                },
+                "ScanFolder TimeDistortion/Registry": {
+                    "watch": "@GEMROOT:TimeDistortion@/Registry",
+                    "recursive": 1,
+                    "order": 102
+                }
+            }
+        }
+    }
+}
