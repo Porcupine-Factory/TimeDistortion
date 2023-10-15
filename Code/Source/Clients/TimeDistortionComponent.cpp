@@ -42,7 +42,9 @@ namespace TimeDistortion
                 ->Attribute(AZ::Script::Attributes::Module, "effects")
                 ->Attribute(AZ::Script::Attributes::Category, "Time Distortion")
                 ->Event("Get Time Distortion Factor", &TimeDistortionComponentRequests::GetTimeDistortionFactor)
-                ->Event("Set Time Distortion Factor", &TimeDistortionComponentRequests::SetTimeDistortionFactor);
+                ->Event("Set Time Distortion Factor", &TimeDistortionComponentRequests::SetTimeDistortionFactor)
+                ->Event("Get Default Fixed Timestep", &TimeDistortionComponentRequests::GetDefaultFixedTimestep)
+                ->Event("Set Default Fixed Timestep", &TimeDistortionComponentRequests::SetDefaultFixedTimestep);
 
             bc->Class<TimeDistortionComponent>()->RequestBus("TimeDistortionComponentRequestBus");
         }
@@ -58,6 +60,10 @@ namespace TimeDistortion
         if(const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
             prevConfig = *config;
         PhysX::PhysXSystemConfiguration modifiedConfig = prevConfig;
+
+        // Get the default PhysX Fixed Time Step
+        m_defaultFixedTimestep = modifiedConfig.m_fixedTimestep;
+
         modifiedConfig.m_fixedTimestep *= m_timeDistortionFactor;
         physicsSystem->UpdateConfiguration(&modifiedConfig);
 
@@ -67,6 +73,17 @@ namespace TimeDistortion
 
     void TimeDistortionComponent::Deactivate()
     {
+        // Reset the time distortion factor
+        if(auto* timeSystem = AZ::Interface<AZ::ITime>::Get())
+            timeSystem->SetSimulationTickScale(1.f);
+        PhysX::PhysXSystemConfiguration prevConfig;
+        auto* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
+        if(const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
+            prevConfig = *config;
+        PhysX::PhysXSystemConfiguration modifiedConfig = prevConfig;
+        modifiedConfig.m_fixedTimestep = m_defaultFixedTimestep;
+        physicsSystem->UpdateConfiguration(&modifiedConfig);
+
         // Disconnect the handler from the request bus
         TimeDistortionComponentRequestBus::Handler::BusDisconnect();
     }
@@ -84,6 +101,10 @@ namespace TimeDistortion
     void TimeDistortionComponent::OnTimeDistortionChanged(){}
 
     // Request Bus getter and setter methods for use in scripts
+    float TimeDistortionComponent::GetTimeDistortionFactor() const
+    {
+        return m_timeDistortionFactor;
+    }
     void TimeDistortionComponent::SetTimeDistortionFactor(const float& new_timeDistortionFactor)
     {
         // Set the new time distortion factor
@@ -97,12 +118,16 @@ namespace TimeDistortion
         if(const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
             prevConfig = *config;
         PhysX::PhysXSystemConfiguration modifiedConfig = prevConfig;
-        modifiedConfig.m_fixedTimestep *= m_timeDistortionFactor;
+        modifiedConfig.m_fixedTimestep = m_defaultFixedTimestep * m_timeDistortionFactor;
         physicsSystem->UpdateConfiguration(&modifiedConfig);
         TimeDistortionNotificationBus::Broadcast(&TimeDistortionNotificationBus::Events::OnTimeDistortionChanged);
     }
-    float TimeDistortionComponent::GetTimeDistortionFactor() const
+    float TimeDistortionComponent::GetDefaultFixedTimestep() const
     {
-        return m_timeDistortionFactor;
+        return m_defaultFixedTimestep;
+    }
+    void TimeDistortionComponent::SetDefaultFixedTimestep(const float& new_defaultFixedTimestep)
+    {
+        m_defaultFixedTimestep = new_defaultFixedTimestep;
     }
 }

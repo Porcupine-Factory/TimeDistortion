@@ -12,6 +12,8 @@ namespace TimeDistortion
 
         virtual void SetTimeDistortionFactor(const float&) = 0;
         virtual float GetTimeDistortionFactor() const = 0;
+        virtual float GetDefaultFixedTimestep() const = 0;
+        virtual void SetDefaultFixedTimestep(const float&) = 0;
     };
 
     using TimeDistortionComponentRequestBus = AZ::EBus<TimeDistortionComponentRequests>;

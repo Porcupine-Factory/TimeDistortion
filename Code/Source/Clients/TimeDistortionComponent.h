@@ -25,6 +25,8 @@ namespace TimeDistortion
         // TimeDistortionRequestBus
         void SetTimeDistortionFactor(const float& new_timeDistortionFactor) override;
         float GetTimeDistortionFactor() const override;
+        float GetDefaultFixedTimestep() const override;
+        void SetDefaultFixedTimestep(const float& new_defaultFixedTimestep) override;
 
     private:
         // TimeDistortionNotificationBus
@@ -32,5 +34,7 @@ namespace TimeDistortion
 
         // Time Distortion Factor
         float m_timeDistortionFactor = 0.5f;
+
+        float m_defaultFixedTimestep = 0.01666667f;
     };
 }
