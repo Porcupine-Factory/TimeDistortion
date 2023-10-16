@@ -1,4 +1,3 @@
-#include "TimeDistortion/TimeDistortionTypeIds.h"
 #include <Clients/TimeDistortionComponent.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Component/Entity.h>
@@ -44,7 +43,8 @@ namespace TimeDistortion
                 ->Event("Get Time Distortion Factor", &TimeDistortionComponentRequests::GetTimeDistortionFactor)
                 ->Event("Set Time Distortion Factor", &TimeDistortionComponentRequests::SetTimeDistortionFactor)
                 ->Event("Get Default Fixed Timestep", &TimeDistortionComponentRequests::GetDefaultFixedTimestep)
-                ->Event("Set Default Fixed Timestep", &TimeDistortionComponentRequests::SetDefaultFixedTimestep);
+                ->Event("Set Default Fixed Timestep", &TimeDistortionComponentRequests::SetDefaultFixedTimestep)
+                ->Event("Apply Default Fixed Timestep", &TimeDistortionComponentRequests::ApplyDefaultFixedTimestep);
 
             bc->Class<TimeDistortionComponent>()->RequestBus("TimeDistortionComponentRequestBus");
         }
@@ -120,6 +120,8 @@ namespace TimeDistortion
         PhysX::PhysXSystemConfiguration modifiedConfig = prevConfig;
         modifiedConfig.m_fixedTimestep = m_defaultFixedTimestep * m_timeDistortionFactor;
         physicsSystem->UpdateConfiguration(&modifiedConfig);
+
+        // Broadcast a notification event letting listeners know that the time distortion factor changed
         TimeDistortionNotificationBus::Broadcast(&TimeDistortionNotificationBus::Events::OnTimeDistortionChanged);
     }
     float TimeDistortionComponent::GetDefaultFixedTimestep() const
@@ -129,5 +131,16 @@ namespace TimeDistortion
     void TimeDistortionComponent::SetDefaultFixedTimestep(const float& new_defaultFixedTimestep)
     {
         m_defaultFixedTimestep = new_defaultFixedTimestep;
+    }
+    void TimeDistortionComponent::ApplyDefaultFixedTimestep() const
+    {
+        // Apply the default PhysX Fixed Time Step
+        PhysX::PhysXSystemConfiguration prevConfig;
+        auto* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
+        if(const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
+            prevConfig = *config;
+        PhysX::PhysXSystemConfiguration modifiedConfig = prevConfig;
+        modifiedConfig.m_fixedTimestep = m_defaultFixedTimestep;
+        physicsSystem->UpdateConfiguration(&modifiedConfig);
     }
 }
