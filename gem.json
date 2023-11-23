@@ -7,13 +7,15 @@
     "origin": "Porcupine Factory",
     "origin_uri": "https://github.com/Porcupine-Factory/TimeDistortion.git",
     "last_updated": "2023-10-15",
-    "sha256":"",
+    "sha256": "",
     "type": "Code",
     "summary": "The Time Distortion Gem gives you the ability to speed up or slow down the perceived time.",
     "canonical_tags": [
         "Gem"
     ],
     "user_tags": [
+        "Gameplay",
+        "Scripting",
         "TimeDistortion"
     ],
     "icon_path": "preview.png",
@@ -23,5 +25,9 @@
         "PhysX"
     ],
     "repo_uri": "https://github.com/Porcupine-Factory/TimeDistortion.git",
-    "restricted": "TimeDistortion"
+    "restricted": "TimeDistortion",
+    "platforms": [
+        "Linux",
+        "Windows"
+    ]
 }
