@@ -2,6 +2,7 @@
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Component/Entity.h>
 #include <System/PhysXSystem.h>
+#include <AzFramework/Physics/SystemBus.h>
 #include <AzCore/Time/ITime.h>
 #include <PhysX/Configuration/PhysXConfiguration.h>
 #include <AzCore/RTTI/BehaviorContext.h>
@@ -44,7 +45,11 @@ namespace TimeDistortion
                 ->Event("Set Time Distortion Factor", &TimeDistortionComponentRequests::SetTimeDistortionFactor)
                 ->Event("Get Default Fixed Timestep", &TimeDistortionComponentRequests::GetDefaultFixedTimestep)
                 ->Event("Set Default Fixed Timestep", &TimeDistortionComponentRequests::SetDefaultFixedTimestep)
-                ->Event("Apply Default Fixed Timestep", &TimeDistortionComponentRequests::ApplyDefaultFixedTimestep);
+                ->Event("Apply Default Fixed Timestep", &TimeDistortionComponentRequests::ApplyDefaultFixedTimestep)
+                ->Event("Get Physics Enabled", &TimeDistortionComponentRequests::GetPhysicsEnabled)
+                ->Event("Set Physics Enabled", &TimeDistortionComponentRequests::SetPhysicsEnabled)
+                ->Event("Get Paused", &TimeDistortionComponentRequests::GetPaused)
+                ->Event("Set Paused", &TimeDistortionComponentRequests::SetPaused);
 
             bc->Class<TimeDistortionComponent>()->RequestBus("TimeDistortionComponentRequestBus");
         }
@@ -142,5 +147,39 @@ namespace TimeDistortion
         PhysX::PhysXSystemConfiguration modifiedConfig = prevConfig;
         modifiedConfig.m_fixedTimestep = m_defaultFixedTimestep;
         physicsSystem->UpdateConfiguration(&modifiedConfig);
+    }
+    bool TimeDistortionComponent::GetPhysicsEnabled() const
+    {
+        return m_physicsEnabled;
+    }
+    void TimeDistortionComponent::SetPhysicsEnabled(const bool& new_physicsEnabled)
+    {
+        m_physicsEnabled = new_physicsEnabled;
+
+        AzPhysics::SceneHandle sceneHandle;
+        Physics::DefaultWorldBus::BroadcastResult(sceneHandle, &Physics::DefaultWorldRequests::GetDefaultSceneHandle);
+        PhysX::PhysXSystem* physXSystem = PhysX::GetPhysXSystem();
+
+        physXSystem->GetScene(sceneHandle)->SetEnabled(m_physicsEnabled);
+    }
+    bool TimeDistortionComponent::GetPaused() const
+    {
+        return m_paused;
+    }
+    void TimeDistortionComponent::SetPaused(const bool& new_paused)
+    {
+        m_paused = new_paused;
+
+        if(m_paused)
+        {
+            SetPhysicsEnabled(false);
+            m_timeDistortionFactorBeforePause = GetTimeDistortionFactor();
+            SetTimeDistortionFactor(0.f);
+        }
+        else
+        {
+            SetTimeDistortionFactor(m_timeDistortionFactorBeforePause);
+            SetPhysicsEnabled(true);
+        }
     }
 }

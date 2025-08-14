@@ -23,11 +23,15 @@ namespace TimeDistortion
         static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided);
 
         // TimeDistortionRequestBus
-        void SetTimeDistortionFactor(const float& new_timeDistortionFactor) override;
         float GetTimeDistortionFactor() const override;
+        void SetTimeDistortionFactor(const float& new_timeDistortionFactor) override;
         float GetDefaultFixedTimestep() const override;
         void SetDefaultFixedTimestep(const float& new_defaultFixedTimestep) override;
         void ApplyDefaultFixedTimestep() const override;
+        bool GetPhysicsEnabled() const override;
+        void SetPhysicsEnabled(const bool& new_physicsEnabled) override;
+        bool GetPaused() const override;
+        void SetPaused(const bool& new_paused) override;
 
     private:
         // TimeDistortionNotificationBus
@@ -37,5 +41,10 @@ namespace TimeDistortion
         float m_timeDistortionFactor = 0.5f;
 
         float m_defaultFixedTimestep = 0.01666667f;
+
+        bool m_physicsEnabled = true;
+
+        bool m_paused = false;
+        float m_timeDistortionFactorBeforePause = 0.5f;
     };
 }

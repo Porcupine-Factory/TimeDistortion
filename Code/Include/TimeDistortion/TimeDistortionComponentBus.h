@@ -10,11 +10,15 @@ namespace TimeDistortion
     public:
         ~TimeDistortionComponentRequests() override = default;
 
-        virtual void SetTimeDistortionFactor(const float&) = 0;
         virtual float GetTimeDistortionFactor() const = 0;
+        virtual void SetTimeDistortionFactor(const float&) = 0;
         virtual float GetDefaultFixedTimestep() const = 0;
         virtual void SetDefaultFixedTimestep(const float&) = 0;
         virtual void ApplyDefaultFixedTimestep() const = 0;
+        virtual bool GetPhysicsEnabled() const = 0;
+        virtual void SetPhysicsEnabled(const bool&) = 0;
+        virtual bool GetPaused() const = 0;
+        virtual void SetPaused(const bool&) = 0;
     };
 
     using TimeDistortionComponentRequestBus = AZ::EBus<TimeDistortionComponentRequests>;
