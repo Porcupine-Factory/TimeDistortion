@@ -102,6 +102,11 @@ namespace TimeDistortion
         provided.push_back(AZ_CRC_CE("TimeDistortionService"));
     }
 
+    void TimeDistortionComponent::GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible)
+    {
+        incompatible.push_back(AZ_CRC_CE("TimeDistortionService"));
+    }
+
     // Event Notification methods for use in scripts
     void TimeDistortionComponent::OnTimeDistortionChanged(){}
 

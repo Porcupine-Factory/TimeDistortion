@@ -21,6 +21,7 @@ namespace TimeDistortion
 
         static void GetRequiredServices([[maybe_unused]] AZ::ComponentDescriptor::DependencyArrayType& required);
         static void GetProvidedServices(AZ::ComponentDescriptor::DependencyArrayType& provided);
+        static void GetIncompatibleServices(AZ::ComponentDescriptor::DependencyArrayType& incompatible);
 
         // TimeDistortionRequestBus
         float GetTimeDistortionFactor() const override;
