@@ -26,6 +26,9 @@ namespace TimeDistortion
         // TimeDistortionRequestBus
         float GetTimeDistortionFactor() const override;
         void SetTimeDistortionFactor(const float& new_timeDistortionFactor) override;
+        bool GetTimestepBasedOnRefreshRate() const override;
+        void SetTimestepBasedOnRefreshRate(const bool& new_timestepBasedOnRefreshRate) override;
+        float GetRefreshRate() const override;
         float GetDefaultFixedTimestep() const override;
         void SetDefaultFixedTimestep(const float& new_defaultFixedTimestep) override;
         void ApplyDefaultFixedTimestep() const override;
@@ -44,6 +47,8 @@ namespace TimeDistortion
         float m_defaultFixedTimestep = 0.01666667f;
 
         bool m_physicsEnabled = true;
+
+        bool m_timestepBasedOnRefreshRate = true;
 
         bool m_paused = false;
         float m_timeDistortionFactorBeforePause = 0.5f;

@@ -12,6 +12,9 @@ namespace TimeDistortion
 
         virtual float GetTimeDistortionFactor() const = 0;
         virtual void SetTimeDistortionFactor(const float&) = 0;
+        virtual bool GetTimestepBasedOnRefreshRate() const = 0 ;
+        virtual void SetTimestepBasedOnRefreshRate(const bool&) = 0;
+        virtual float GetRefreshRate() const = 0;
         virtual float GetDefaultFixedTimestep() const = 0;
         virtual void SetDefaultFixedTimestep(const float&) = 0;
         virtual void ApplyDefaultFixedTimestep() const = 0;

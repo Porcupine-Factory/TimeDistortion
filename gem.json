@@ -22,7 +22,8 @@
     "requirements": "This requires the PhysX gem.",
     "documentation_url": "https://github.com/Porcupine-Factory/TimeDistortion/wiki",
     "dependencies": [
-        "PhysX5"
+        "PhysX5",
+        "Atom_RPI"
     ],
     "repo_uri": "https://github.com/Porcupine-Factory/TimeDistortion.git",
     "restricted": "TimeDistortion",

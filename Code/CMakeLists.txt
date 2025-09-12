@@ -51,6 +51,7 @@ ly_add_target(
             AZ::AzCore
             AZ::AzFramework
             Gem::PhysX.Static
+            Gem::Atom_RPI.Public
 )
 
 # Here add ${gem_name} target, it depends on the Private Object library and Public API interface
@@ -124,6 +125,7 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
                 AZ::AzToolsFramework
                 Gem::${gem_name}.Private.Object
                 Gem::PhysX.Static
+                Gem::Atom_RPI.Public
     )
 
     ly_add_target(
