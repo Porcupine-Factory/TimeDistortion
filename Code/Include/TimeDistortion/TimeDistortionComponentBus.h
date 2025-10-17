@@ -12,7 +12,7 @@ namespace TimeDistortion
 
         virtual float GetTimeDistortionFactor() const = 0;
         virtual void SetTimeDistortionFactor(const float&) = 0;
-        virtual bool GetTimestepBasedOnRefreshRate() const = 0 ;
+        virtual bool GetTimestepBasedOnRefreshRate() const = 0;
         virtual void SetTimestepBasedOnRefreshRate(const bool&) = 0;
         virtual float GetRefreshRate() const = 0;
         virtual float GetDefaultFixedTimestep() const = 0;
@@ -26,8 +26,7 @@ namespace TimeDistortion
 
     using TimeDistortionComponentRequestBus = AZ::EBus<TimeDistortionComponentRequests>;
 
-    class TimeDistortionNotifications
-        : public AZ::ComponentBus
+    class TimeDistortionNotifications : public AZ::ComponentBus
     {
     public:
         virtual void OnTimeDistortionChanged() = 0;
@@ -40,9 +39,8 @@ namespace TimeDistortion
         , public AZ::BehaviorEBusHandler
     {
     public:
-        AZ_EBUS_BEHAVIOR_BINDER(TimeDistortionNotificationHandler,
-            "{814559c9-032e-44ff-85fa-fc1a8ef95068}",
-            AZ::SystemAllocator, OnTimeDistortionChanged);
+        AZ_EBUS_BEHAVIOR_BINDER(
+            TimeDistortionNotificationHandler, "{814559c9-032e-44ff-85fa-fc1a8ef95068}", AZ::SystemAllocator, OnTimeDistortionChanged);
 
         void OnTimeDistortionChanged() override
         {

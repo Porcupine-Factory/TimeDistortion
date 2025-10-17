@@ -1,20 +1,22 @@
 
-#include <AzCore/Serialization/SerializeContext.h>
 #include "TimeDistortionEditorSystemComponent.h"
+#include <AzCore/Serialization/SerializeContext.h>
 
 #include <TimeDistortion/TimeDistortionTypeIds.h>
 
 namespace TimeDistortion
 {
-    AZ_COMPONENT_IMPL(TimeDistortionEditorSystemComponent, "TimeDistortionEditorSystemComponent",
-        TimeDistortionEditorSystemComponentTypeId, BaseSystemComponent);
+    AZ_COMPONENT_IMPL(
+        TimeDistortionEditorSystemComponent,
+        "TimeDistortionEditorSystemComponent",
+        TimeDistortionEditorSystemComponentTypeId,
+        BaseSystemComponent);
 
     void TimeDistortionEditorSystemComponent::Reflect(AZ::ReflectContext* context)
     {
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serializeContext->Class<TimeDistortionEditorSystemComponent, TimeDistortionSystemComponent>()
-                ->Version(0);
+            serializeContext->Class<TimeDistortionEditorSystemComponent, TimeDistortionSystemComponent>()->Version(0);
         }
     }
 

@@ -1,49 +1,51 @@
 #include <Clients/TimeDistortionComponent.h>
 
-#include <limits>
-#include <AzCore/Serialization/EditContext.h>
-#include <AzCore/Component/Entity.h>
-#include <System/PhysXSystem.h>
-#include <AzFramework/Physics/SystemBus.h>
-#include <AzCore/Time/ITime.h>
-#include <PhysX/Configuration/PhysXConfiguration.h>
-#include <AzCore/RTTI/BehaviorContext.h>
 #include <Atom/RPI.Public/ViewportContext.h>
 #include <Atom/RPI.Public/ViewportContextBus.h>
+#include <AzCore/Component/Entity.h>
+#include <AzCore/RTTI/BehaviorContext.h>
+#include <AzCore/Serialization/EditContext.h>
+#include <AzCore/Time/ITime.h>
+#include <AzFramework/Physics/SystemBus.h>
+#include <PhysX/Configuration/PhysXConfiguration.h>
+#include <System/PhysXSystem.h>
+#include <limits>
 
 namespace TimeDistortion
 {
     void TimeDistortionComponent::Reflect(AZ::ReflectContext* rc)
     {
-        if(auto sc = azrtti_cast<AZ::SerializeContext*>(rc))
+        if (auto sc = azrtti_cast<AZ::SerializeContext*>(rc))
         {
             sc->Class<TimeDistortionComponent, AZ::Component>()
-              ->Field("Time Distortion Factor", &TimeDistortionComponent::m_timeDistortionFactor)
-              ->Field("Set Timestep Based on Refresh Rate", &TimeDistortionComponent::m_timestepBasedOnRefreshRate)
-              ->Version(1);
+                ->Field("Time Distortion Factor", &TimeDistortionComponent::m_timeDistortionFactor)
+                ->Field("Set Timestep Based on Refresh Rate", &TimeDistortionComponent::m_timestepBasedOnRefreshRate)
+                ->Version(1);
 
-            if(AZ::EditContext* ec = sc->GetEditContext())
+            if (AZ::EditContext* ec = sc->GetEditContext())
             {
                 using namespace AZ::Edit::Attributes;
-                ec->Class<TimeDistortionComponent>("Time Distortion",
-                    "Distort time by making everything faster or slower")
+                ec->Class<TimeDistortionComponent>("Time Distortion", "Distort time by making everything faster or slower")
                     ->ClassElement(AZ::Edit::ClassElements::EditorData, "")
                     ->Attribute(AppearsInAddComponentMenu, AZ_CRC_CE("Game"))
                     ->Attribute(Category, "Time Distortion")
                     ->Attribute(AutoExpand, false)
-                    ->DataElement(nullptr,
+                    ->DataElement(
+                        nullptr,
                         &TimeDistortionComponent::m_timeDistortionFactor,
-                        "Time Distortion Factor", "Factor applied to the assumed tick and physics timestep.")
-                    ->DataElement(nullptr,
+                        "Time Distortion Factor",
+                        "Factor applied to the assumed tick and physics timestep.")
+                    ->DataElement(
+                        nullptr,
                         &TimeDistortionComponent::m_timestepBasedOnRefreshRate,
-                        "Set Timestep Based on Refresh Rate", "When enabled, the physics timestep will be set based on the monitor's refresh rate.");
+                        "Set Timestep Based on Refresh Rate",
+                        "When enabled, the physics timestep will be set based on the monitor's refresh rate.");
             }
         }
 
-        if(auto bc = azrtti_cast<AZ::BehaviorContext*>(rc))
+        if (auto bc = azrtti_cast<AZ::BehaviorContext*>(rc))
         {
-            bc->EBus<TimeDistortionNotificationBus>("TimeDistortionNotificationBus")
-                ->Handler<TimeDistortionNotificationHandler>();
+            bc->EBus<TimeDistortionNotificationBus>("TimeDistortionNotificationBus")->Handler<TimeDistortionNotificationHandler>();
 
             bc->EBus<TimeDistortionComponentRequestBus>("TimeDistortionComponentRequestBus")
                 ->Attribute(AZ::Script::Attributes::Scope, AZ::Script::Attributes::ScopeFlags::Common)
@@ -68,16 +70,18 @@ namespace TimeDistortion
 
     void TimeDistortionComponent::Activate()
     {
-        if(m_timestepBasedOnRefreshRate)
+        if (m_timestepBasedOnRefreshRate)
         {
             AzFramework::NativeWindowHandle windowHandle = nullptr;
             windowHandle = AZ::RPI::ViewportContextRequests::Get()->GetDefaultViewportContext()->GetWindowHandle();
-            if(windowHandle)
+            if (windowHandle)
             {
                 float refreshRate = 60.f;
-                AzFramework::WindowRequestBus::EventResult(refreshRate, windowHandle, &AzFramework::WindowRequestBus::Events::GetDisplayRefreshRate);
+                AzFramework::WindowRequestBus::EventResult(
+                    refreshRate, windowHandle, &AzFramework::WindowRequestBus::Events::GetDisplayRefreshRate);
 
-                AzPhysics::SystemConfiguration* config = const_cast<AzPhysics::SystemConfiguration*>(AZ::Interface<AzPhysics::SystemInterface>::Get()->GetConfiguration());
+                AzPhysics::SystemConfiguration* config =
+                    const_cast<AzPhysics::SystemConfiguration*>(AZ::Interface<AzPhysics::SystemInterface>::Get()->GetConfiguration());
 
                 config->m_fixedTimestep = 1.f / refreshRate;
 
@@ -86,18 +90,18 @@ namespace TimeDistortion
         }
 
         // Apply the default time distortion factor that's entered in the component's text field
-        if(auto* timeSystem = AZ::Interface<AZ::ITime>::Get())
+        if (auto* timeSystem = AZ::Interface<AZ::ITime>::Get())
             timeSystem->SetSimulationTickScale(m_timeDistortionFactor);
         PhysX::PhysXSystemConfiguration prevConfig;
         auto* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
-        if(const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
+        if (const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
             prevConfig = *config;
         PhysX::PhysXSystemConfiguration modifiedConfig = prevConfig;
 
         // Get the default PhysX Fixed Timestep
         m_defaultFixedTimestep = modifiedConfig.m_fixedTimestep;
 
-        if(m_timeDistortionFactor != 1.f && m_timeDistortionFactor >= 0.f)
+        if (m_timeDistortionFactor != 1.f && m_timeDistortionFactor >= 0.f)
         {
             modifiedConfig.m_fixedTimestep *= m_timeDistortionFactor;
             physicsSystem->UpdateConfiguration(&modifiedConfig);
@@ -110,11 +114,11 @@ namespace TimeDistortion
     void TimeDistortionComponent::Deactivate()
     {
         // Reset the time distortion factor
-        if(auto* timeSystem = AZ::Interface<AZ::ITime>::Get())
+        if (auto* timeSystem = AZ::Interface<AZ::ITime>::Get())
             timeSystem->SetSimulationTickScale(1.f);
         PhysX::PhysXSystemConfiguration prevConfig;
         auto* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
-        if(const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
+        if (const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
             prevConfig = *config;
         PhysX::PhysXSystemConfiguration modifiedConfig = prevConfig;
         modifiedConfig.m_fixedTimestep = m_defaultFixedTimestep;
@@ -139,7 +143,9 @@ namespace TimeDistortion
     }
 
     // Event Notification methods for use in scripts
-    void TimeDistortionComponent::OnTimeDistortionChanged(){}
+    void TimeDistortionComponent::OnTimeDistortionChanged()
+    {
+    }
 
     // Request Bus getter and setter methods for use in scripts
     float TimeDistortionComponent::GetTimeDistortionFactor() const
@@ -148,17 +154,17 @@ namespace TimeDistortion
     }
     void TimeDistortionComponent::SetTimeDistortionFactor(const float& new_timeDistortionFactor)
     {
-        if(new_timeDistortionFactor >= 0.f)
+        if (new_timeDistortionFactor >= 0.f)
         {
             // Set the new time distortion factor
             m_timeDistortionFactor = new_timeDistortionFactor;
 
             // Apply the new time distortion factor
-            if(auto* timeSystem = AZ::Interface<AZ::ITime>::Get())
+            if (auto* timeSystem = AZ::Interface<AZ::ITime>::Get())
                 timeSystem->SetSimulationTickScale(m_timeDistortionFactor);
             PhysX::PhysXSystemConfiguration prevConfig;
             auto* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
-            if(const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
+            if (const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
                 prevConfig = *config;
             PhysX::PhysXSystemConfiguration modifiedConfig = prevConfig;
             modifiedConfig.m_fixedTimestep = m_defaultFixedTimestep * m_timeDistortionFactor;
@@ -178,16 +184,18 @@ namespace TimeDistortion
     {
         m_timestepBasedOnRefreshRate = new_timestepBasedOnRefreshRate;
 
-        if(m_timestepBasedOnRefreshRate)
+        if (m_timestepBasedOnRefreshRate)
         {
             AzFramework::NativeWindowHandle windowHandle = nullptr;
             windowHandle = AZ::RPI::ViewportContextRequests::Get()->GetDefaultViewportContext()->GetWindowHandle();
-            if(windowHandle)
+            if (windowHandle)
             {
                 float refreshRate = 60.f;
-                AzFramework::WindowRequestBus::EventResult(refreshRate, windowHandle, &AzFramework::WindowRequestBus::Events::GetDisplayRefreshRate);
+                AzFramework::WindowRequestBus::EventResult(
+                    refreshRate, windowHandle, &AzFramework::WindowRequestBus::Events::GetDisplayRefreshRate);
 
-                AzPhysics::SystemConfiguration* config = const_cast<AzPhysics::SystemConfiguration*>(AZ::Interface<AzPhysics::SystemInterface>::Get()->GetConfiguration());
+                AzPhysics::SystemConfiguration* config =
+                    const_cast<AzPhysics::SystemConfiguration*>(AZ::Interface<AzPhysics::SystemInterface>::Get()->GetConfiguration());
 
                 config->m_fixedTimestep = 1.f / refreshRate;
 
@@ -199,10 +207,11 @@ namespace TimeDistortion
     {
         AzFramework::NativeWindowHandle windowHandle = nullptr;
         windowHandle = AZ::RPI::ViewportContextRequests::Get()->GetDefaultViewportContext()->GetWindowHandle();
-        if(windowHandle)
+        if (windowHandle)
         {
             float refreshRate = 60.f;
-            AzFramework::WindowRequestBus::EventResult(refreshRate, windowHandle, &AzFramework::WindowRequestBus::Events::GetDisplayRefreshRate);
+            AzFramework::WindowRequestBus::EventResult(
+                refreshRate, windowHandle, &AzFramework::WindowRequestBus::Events::GetDisplayRefreshRate);
 
             return refreshRate;
         }
@@ -225,7 +234,7 @@ namespace TimeDistortion
         // Apply the default PhysX Fixed Time Step
         PhysX::PhysXSystemConfiguration prevConfig;
         auto* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
-        if(const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
+        if (const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
             prevConfig = *config;
         PhysX::PhysXSystemConfiguration modifiedConfig = prevConfig;
         modifiedConfig.m_fixedTimestep = m_defaultFixedTimestep;
@@ -253,7 +262,7 @@ namespace TimeDistortion
     {
         m_paused = new_paused;
 
-        if(m_paused)
+        if (m_paused)
         {
             SetPhysicsEnabled(false);
             m_timeDistortionFactorBeforePause = GetTimeDistortionFactor();
@@ -265,4 +274,4 @@ namespace TimeDistortion
             SetPhysicsEnabled(true);
         }
     }
-}
+} // namespace TimeDistortion

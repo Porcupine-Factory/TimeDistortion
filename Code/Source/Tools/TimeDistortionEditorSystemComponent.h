@@ -13,6 +13,7 @@ namespace TimeDistortion
         , protected AzToolsFramework::EditorEvents::Bus::Handler
     {
         using BaseSystemComponent = TimeDistortionSystemComponent;
+
     public:
         AZ_COMPONENT_DECL(TimeDistortionEditorSystemComponent);
 

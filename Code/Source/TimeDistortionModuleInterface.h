@@ -6,8 +6,7 @@
 
 namespace TimeDistortion
 {
-    class TimeDistortionModuleInterface
-        : public AZ::Module
+    class TimeDistortionModuleInterface : public AZ::Module
     {
     public:
         AZ_TYPE_INFO_WITH_NAME_DECL(TimeDistortionModuleInterface)
@@ -21,4 +20,4 @@ namespace TimeDistortion
          */
         AZ::ComponentTypeList GetRequiredSystemComponents() const override;
     };
-}// namespace TimeDistortion
+} // namespace TimeDistortion

@@ -1,12 +1,11 @@
 
+#include "TimeDistortionEditorSystemComponent.h"
 #include <TimeDistortion/TimeDistortionTypeIds.h>
 #include <TimeDistortionModuleInterface.h>
-#include "TimeDistortionEditorSystemComponent.h"
 
 namespace TimeDistortion
 {
-    class TimeDistortionEditorModule
-        : public TimeDistortionModuleInterface
+    class TimeDistortionEditorModule : public TimeDistortionModuleInterface
     {
     public:
         AZ_RTTI(TimeDistortionEditorModule, TimeDistortionEditorModuleTypeId, TimeDistortionModuleInterface);
@@ -16,11 +15,13 @@ namespace TimeDistortion
         {
             // Push results of [MyComponent]::CreateDescriptor() into m_descriptors here.
             // Add ALL components descriptors associated with this gem to m_descriptors.
-            // This will associate the AzTypeInfo information for the components with the the SerializeContext, BehaviorContext and EditContext.
-            // This happens through the [MyComponent]::Reflect() function.
-            m_descriptors.insert(m_descriptors.end(), {
-                TimeDistortionEditorSystemComponent::CreateDescriptor(),
-            });
+            // This will associate the AzTypeInfo information for the components with the the SerializeContext, BehaviorContext and
+            // EditContext. This happens through the [MyComponent]::Reflect() function.
+            m_descriptors.insert(
+                m_descriptors.end(),
+                {
+                    TimeDistortionEditorSystemComponent::CreateDescriptor(),
+                });
         }
 
         /**
@@ -29,11 +30,11 @@ namespace TimeDistortion
          */
         AZ::ComponentTypeList GetRequiredSystemComponents() const override
         {
-            return AZ::ComponentTypeList {
+            return AZ::ComponentTypeList{
                 azrtti_typeid<TimeDistortionEditorSystemComponent>(),
             };
         }
     };
-}// namespace TimeDistortion
+} // namespace TimeDistortion
 
 AZ_DECLARE_MODULE_CLASS(Gem_TimeDistortion, TimeDistortion::TimeDistortionEditorModule)

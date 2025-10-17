@@ -7,16 +7,13 @@
 
 namespace TimeDistortion
 {
-    AZ_COMPONENT_IMPL(TimeDistortionSystemComponent, "TimeDistortionSystemComponent",
-        TimeDistortionSystemComponentTypeId);
+    AZ_COMPONENT_IMPL(TimeDistortionSystemComponent, "TimeDistortionSystemComponent", TimeDistortionSystemComponentTypeId);
 
     void TimeDistortionSystemComponent::Reflect(AZ::ReflectContext* context)
     {
         if (auto serializeContext = azrtti_cast<AZ::SerializeContext*>(context))
         {
-            serializeContext->Class<TimeDistortionSystemComponent, AZ::Component>()
-                ->Version(0)
-                ;
+            serializeContext->Class<TimeDistortionSystemComponent, AZ::Component>()->Version(0);
         }
     }
 

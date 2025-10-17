@@ -16,8 +16,7 @@ namespace TimeDistortion
         // Put your public methods here
     };
 
-    class TimeDistortionBusTraits
-        : public AZ::EBusTraits
+    class TimeDistortionBusTraits : public AZ::EBusTraits
     {
     public:
         //////////////////////////////////////////////////////////////////////////

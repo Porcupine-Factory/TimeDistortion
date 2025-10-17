@@ -53,4 +53,4 @@ namespace TimeDistortion
         bool m_paused = false;
         float m_timeDistortionFactorBeforePause = 0.5f;
     };
-}
+} // namespace TimeDistortion
