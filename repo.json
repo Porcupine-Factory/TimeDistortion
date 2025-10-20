@@ -2,8 +2,8 @@
     "repo_name":"TimeDistortion",
     "origin":"Porcupine Factory",
     "repo_uri": "https://github.com/Porcupine-Factory/TimeDistortion.git",
-    "summary": "The First Person Controller Gem provides customizable controls for your character in the first-person perspective.",
-    "additional_info": "Provides movement, rotation, jumping, sprinting, and crouching.",
+    "summary": "The Time Distortion Gem provides the ability to slow down and speed up the simulation time.",
+    "additional_info": "Provides slowing down, speeding up, or stopping the simulation.",
     "last_updated": "01/30/2023 01:00pm",
     "gems": [
         "https://raw.githubusercontent.com/Porcupine-Factory/TimeDistortion/main"
