@@ -19,7 +19,7 @@ namespace TimeDistortion
         {
             sc->Class<TimeDistortionComponent, AZ::Component>()
                 ->Field("Time Distortion Factor", &TimeDistortionComponent::m_timeDistortionFactor)
-                ->Field("Set Timestep Based on Refresh Rate", &TimeDistortionComponent::m_timestepBasedOnRefreshRate)
+                ->Field("Set Timestep Based on Refresh Rate for Export Builds", &TimeDistortionComponent::m_timestepBasedOnRefreshRate)
                 ->Version(1);
 
             if (AZ::EditContext* ec = sc->GetEditContext())
@@ -38,8 +38,9 @@ namespace TimeDistortion
                     ->DataElement(
                         nullptr,
                         &TimeDistortionComponent::m_timestepBasedOnRefreshRate,
-                        "Set Timestep Based on Refresh Rate",
-                        "When enabled, the physics timestep will be set based on the monitor's refresh rate.");
+                        "Set Timestep Based on Refresh Rate for Export Builds",
+                        "When enabled, the physics timestep will be set based on the "
+                        "monitor's refresh rate for exported builds of the project.");
             }
         }
 
@@ -70,7 +71,16 @@ namespace TimeDistortion
 
     void TimeDistortionComponent::Activate()
     {
-        if (m_timestepBasedOnRefreshRate)
+        // Check whether the game is being ran in the O3DE editor
+        AZ::ApplicationTypeQuery applicationType;
+        if (auto componentApplicationRequests = AZ::Interface<AZ::ComponentApplicationRequests>::Get();
+            componentApplicationRequests != nullptr)
+        {
+            componentApplicationRequests->QueryApplicationType(applicationType);
+        }
+
+        // Set the timestep to 1/(refresh rate) if it's enabled and it's not running from the editor since it always reports 60Hz
+        if (!applicationType.IsEditor() && m_timestepBasedOnRefreshRate)
         {
             AzFramework::NativeWindowHandle windowHandle = nullptr;
             windowHandle = AZ::RPI::ViewportContextRequests::Get()->GetDefaultViewportContext()->GetWindowHandle();
