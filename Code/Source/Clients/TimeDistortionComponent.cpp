@@ -6,6 +6,7 @@
 #include <AzCore/RTTI/BehaviorContext.h>
 #include <AzCore/Serialization/EditContext.h>
 #include <AzCore/Time/ITime.h>
+#include <AzFramework/Components/ConsoleBus.h>
 #include <AzFramework/Physics/SystemBus.h>
 #include <PhysX/Configuration/PhysXConfiguration.h>
 #include <System/PhysXSystem.h>
@@ -20,6 +21,13 @@ namespace TimeDistortion
             sc->Class<TimeDistortionComponent, AZ::Component>()
                 ->Field("Time Distortion Factor", &TimeDistortionComponent::m_timeDistortionFactor)
                 ->Field("Set Timestep Based on Refresh Rate for Export Builds", &TimeDistortionComponent::m_timestepBasedOnRefreshRate)
+                ->Attribute(AZ::Edit::Attributes::ChangeNotify, AZ::Edit::PropertyRefreshLevels::AttributesAndValues)
+                ->Field("VSync", &TimeDistortionComponent::m_vsync)
+                ->Field("Max FPS", &TimeDistortionComponent::m_sysMaxFPS)
+                ->Attribute(AZ::Edit::Attributes::Suffix, " fps")
+                ->Attribute(AZ::Edit::Attributes::Min, -1)
+                ->Field("Set Timestep to 1/(Max FPS)", &TimeDistortionComponent::m_applyFPSToTimestep)
+                ->Attribute(AZ::Edit::Attributes::ReadOnly, &TimeDistortionComponent::GetTimestepBasedOnRefreshRate)
                 ->Version(1);
 
             if (AZ::EditContext* ec = sc->GetEditContext())
@@ -40,7 +48,24 @@ namespace TimeDistortion
                         &TimeDistortionComponent::m_timestepBasedOnRefreshRate,
                         "Set Timestep Based on Refresh Rate for Export Builds",
                         "When enabled, the physics timestep will be set based on the "
-                        "monitor's refresh rate for exported builds of the project.");
+                        "monitor's refresh rate for exported builds of the project.")
+                    ->DataElement(nullptr, &TimeDistortionComponent::m_vsync, "VSync", "Enable or disable VSync by default.")
+                    ->DataElement(
+                        nullptr,
+                        &TimeDistortionComponent::m_sysMaxFPS,
+                        "Max FPS",
+                        "Set the maximum framerate, a value of -1 removes the framerate limitation, "
+                        "this value only applies when VSync is off.")
+                    ->DataElement(
+                        nullptr,
+                        &TimeDistortionComponent::m_applyFPSToTimestep,
+                        "Set Timestep to 1/(Max FPS)",
+                        "Set the physics timestep to 1/(Max FPS). If \"Set Timestep Based on Refresh Rate for Export Builds\" "
+                        "is enabled then it takes precedence over this setting for export builds. When enabled, this will continue to be "
+                        "applied on successive game/simulation runs instead of the value in the PhysX Configuration "
+                        "unless it is disabled and the value in the PhysX Configuration is reentered "
+                        "(e.g. by selecting the field in PhysX Configuration and pressing enter), "
+                        "or when the O3DE editor is closed and reopened.");
             }
         }
 
@@ -60,6 +85,10 @@ namespace TimeDistortion
                 ->Event("Get Default Fixed Timestep", &TimeDistortionComponentRequests::GetDefaultFixedTimestep)
                 ->Event("Set Default Fixed Timestep", &TimeDistortionComponentRequests::SetDefaultFixedTimestep)
                 ->Event("Apply Default Fixed Timestep", &TimeDistortionComponentRequests::ApplyDefaultFixedTimestep)
+                ->Event("Get VSync", &TimeDistortionComponentRequests::GetVSync)
+                ->Event("Set VSync", &TimeDistortionComponentRequests::SetVSync)
+                ->Event("Get Sys Max FPS", &TimeDistortionComponentRequests::GetSysMaxFPS)
+                ->Event("Set Sys Max FPS", &TimeDistortionComponentRequests::SetSysMaxFPS)
                 ->Event("Get Physics Enabled", &TimeDistortionComponentRequests::GetPhysicsEnabled)
                 ->Event("Set Physics Enabled", &TimeDistortionComponentRequests::SetPhysicsEnabled)
                 ->Event("Get Paused", &TimeDistortionComponentRequests::GetPaused)
@@ -116,6 +145,10 @@ namespace TimeDistortion
             modifiedConfig.m_fixedTimestep *= m_timeDistortionFactor;
             physicsSystem->UpdateConfiguration(&modifiedConfig);
         }
+
+        // Set vsync_interval and sys_MaxFPS
+        SetVSync(m_vsync);
+        SetSysMaxFPS(m_sysMaxFPS, (m_applyFPSToTimestep && (applicationType.IsEditor() || !m_timestepBasedOnRefreshRate)));
 
         // Connect the handler to the request bus
         TimeDistortionComponentRequestBus::Handler::BusConnect(GetEntityId());
@@ -231,8 +264,16 @@ namespace TimeDistortion
             return std::numeric_limits<float>::quiet_NaN();
         }
     }
-    float TimeDistortionComponent::GetDefaultFixedTimestep() const
+    float TimeDistortionComponent::GetDefaultFixedTimestep()
     {
+        PhysX::PhysXSystemConfiguration physxConfig;
+        auto* physicsSystem = AZ::Interface<AzPhysics::SystemInterface>::Get();
+        if (const auto* config = azdynamic_cast<const PhysX::PhysXSystemConfiguration*>(physicsSystem->GetConfiguration()))
+            physxConfig = *config;
+
+        // Get the default PhysX Fixed Timestep
+        m_defaultFixedTimestep = physxConfig.m_fixedTimestep;
+
         return m_defaultFixedTimestep;
     }
     void TimeDistortionComponent::SetDefaultFixedTimestep(const float& new_defaultFixedTimestep)
@@ -249,6 +290,66 @@ namespace TimeDistortion
         PhysX::PhysXSystemConfiguration modifiedConfig = prevConfig;
         modifiedConfig.m_fixedTimestep = m_defaultFixedTimestep;
         physicsSystem->UpdateConfiguration(&modifiedConfig);
+    }
+    bool TimeDistortionComponent::GetVSync()
+    {
+        if (auto console = AZ::Interface<AZ::IConsole>::Get(); console != nullptr)
+        {
+            int vsync;
+            console->GetCvarValue("vsync_interval", vsync);
+            if (vsync == 1)
+            {
+                m_vsync = true;
+                return m_vsync;
+            }
+            else
+            {
+                m_vsync = false;
+                return m_vsync;
+            }
+        }
+        else
+            return m_vsync;
+    }
+    void TimeDistortionComponent::SetVSync(const bool& new_vsync)
+    {
+        m_vsync = new_vsync;
+        if (m_vsync)
+            AzFramework::ConsoleRequestBus::Broadcast(&AzFramework::ConsoleRequestBus::Events::ExecuteConsoleCommand, "vsync_interval 1");
+        else
+            AzFramework::ConsoleRequestBus::Broadcast(&AzFramework::ConsoleRequestBus::Events::ExecuteConsoleCommand, "vsync_interval 0");
+    }
+    int TimeDistortionComponent::GetSysMaxFPS()
+    {
+        if (auto console = AZ::Interface<AZ::IConsole>::Get(); console != nullptr)
+        {
+            int sysMaxFPS;
+            console->GetCvarValue("sys_MaxFPS", sysMaxFPS);
+            m_sysMaxFPS = sysMaxFPS;
+            return m_sysMaxFPS;
+        }
+        else
+            return 0;
+    }
+    void TimeDistortionComponent::SetSysMaxFPS(const int& new_sysMaxFPS, const bool& setTimestepToo)
+    {
+        if (new_sysMaxFPS > 0)
+        {
+            m_sysMaxFPS = new_sysMaxFPS;
+            AzFramework::ConsoleRequestBus::Broadcast(
+                &AzFramework::ConsoleRequestBus::Events::ExecuteConsoleCommand,
+                (("sys_MaxFPS " + AZStd::to_string(new_sysMaxFPS))).c_str());
+            if (setTimestepToo)
+            {
+                SetDefaultFixedTimestep(1.f / float(m_sysMaxFPS));
+                ApplyDefaultFixedTimestep();
+            }
+        }
+        else if (new_sysMaxFPS < 0)
+        {
+            m_sysMaxFPS = -1;
+            AzFramework::ConsoleRequestBus::Broadcast(&AzFramework::ConsoleRequestBus::Events::ExecuteConsoleCommand, ("sys_MaxFPS -1"));
+        }
     }
     bool TimeDistortionComponent::GetPhysicsEnabled() const
     {

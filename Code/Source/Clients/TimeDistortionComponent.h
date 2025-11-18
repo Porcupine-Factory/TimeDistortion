@@ -29,9 +29,13 @@ namespace TimeDistortion
         bool GetTimestepBasedOnRefreshRate() const override;
         void SetTimestepBasedOnRefreshRate(const bool& new_timestepBasedOnRefreshRate) override;
         float GetRefreshRate() const override;
-        float GetDefaultFixedTimestep() const override;
+        float GetDefaultFixedTimestep() override;
         void SetDefaultFixedTimestep(const float& new_defaultFixedTimestep) override;
         void ApplyDefaultFixedTimestep() const override;
+        bool GetVSync() override;
+        void SetVSync(const bool& new_vsync) override;
+        int GetSysMaxFPS() override;
+        void SetSysMaxFPS(const int& new_sysMaxFPS, const bool& setTimestepToo) override;
         bool GetPhysicsEnabled() const override;
         void SetPhysicsEnabled(const bool& new_physicsEnabled) override;
         bool GetPaused() const override;
@@ -52,5 +56,9 @@ namespace TimeDistortion
 
         bool m_paused = false;
         float m_timeDistortionFactorBeforePause = 0.5f;
+
+        bool m_vsync = true;
+        bool m_applyFPSToTimestep = false;
+        int m_sysMaxFPS = -1;
     };
 } // namespace TimeDistortion
