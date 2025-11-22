@@ -50,7 +50,7 @@ ly_add_target(
         PUBLIC
             AZ::AzCore
             AZ::AzFramework
-            Gem::PhysX5.Static
+            Gem::PhysX.Static
             Gem::Atom_RPI.Public
 )
 
@@ -124,7 +124,7 @@ if(PAL_TRAIT_BUILD_HOST_TOOLS)
             PUBLIC
                 AZ::AzToolsFramework
                 Gem::${gem_name}.Private.Object
-                Gem::PhysX5.Static
+                Gem::PhysX.Static
                 Gem::Atom_RPI.Public
     )
 
