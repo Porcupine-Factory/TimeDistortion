@@ -115,14 +115,14 @@ namespace TimeDistortion
             windowHandle = AZ::RPI::ViewportContextRequests::Get()->GetDefaultViewportContext()->GetWindowHandle();
             if (windowHandle)
             {
-                float refreshRate = 60.f;
+                decltype(AZStd::declval<AzFramework::WindowRequests>().GetDisplayRefreshRate()) refreshRate = 60;
                 AzFramework::WindowRequestBus::EventResult(
                     refreshRate, windowHandle, &AzFramework::WindowRequestBus::Events::GetDisplayRefreshRate);
 
                 AzPhysics::SystemConfiguration* config =
                     const_cast<AzPhysics::SystemConfiguration*>(AZ::Interface<AzPhysics::SystemInterface>::Get()->GetConfiguration());
 
-                config->m_fixedTimestep = 1.f / refreshRate;
+                config->m_fixedTimestep = 1.f / static_cast<float>(refreshRate);
 
                 AZ::Interface<AzPhysics::SystemInterface>::Get()->UpdateConfiguration(config, true);
             }
@@ -233,14 +233,14 @@ namespace TimeDistortion
             windowHandle = AZ::RPI::ViewportContextRequests::Get()->GetDefaultViewportContext()->GetWindowHandle();
             if (windowHandle)
             {
-                float refreshRate = 60.f;
+                decltype(AZStd::declval<AzFramework::WindowRequests>().GetDisplayRefreshRate()) refreshRate = 60;
                 AzFramework::WindowRequestBus::EventResult(
                     refreshRate, windowHandle, &AzFramework::WindowRequestBus::Events::GetDisplayRefreshRate);
 
                 AzPhysics::SystemConfiguration* config =
                     const_cast<AzPhysics::SystemConfiguration*>(AZ::Interface<AzPhysics::SystemInterface>::Get()->GetConfiguration());
 
-                config->m_fixedTimestep = 1.f / refreshRate;
+                config->m_fixedTimestep = 1.f / static_cast<float>(refreshRate);
 
                 AZ::Interface<AzPhysics::SystemInterface>::Get()->UpdateConfiguration(config, true);
             }
@@ -252,11 +252,11 @@ namespace TimeDistortion
         windowHandle = AZ::RPI::ViewportContextRequests::Get()->GetDefaultViewportContext()->GetWindowHandle();
         if (windowHandle)
         {
-            float refreshRate = 60.f;
+            decltype(AZStd::declval<AzFramework::WindowRequests>().GetDisplayRefreshRate()) refreshRate = 60;
             AzFramework::WindowRequestBus::EventResult(
                 refreshRate, windowHandle, &AzFramework::WindowRequestBus::Events::GetDisplayRefreshRate);
 
-            return refreshRate;
+            return static_cast<float>(refreshRate);
         }
         else
         {
