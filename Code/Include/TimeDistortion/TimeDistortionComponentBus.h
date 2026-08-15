@@ -11,21 +11,21 @@ namespace TimeDistortion
         ~TimeDistortionComponentRequests() override = default;
 
         virtual float GetTimeDistortionFactor() const = 0;
-        virtual void SetTimeDistortionFactor(const float&) = 0;
+        virtual void SetTimeDistortionFactor(const float) = 0;
         virtual bool GetTimestepBasedOnRefreshRate() const = 0;
-        virtual void SetTimestepBasedOnRefreshRate(const bool&) = 0;
+        virtual void SetTimestepBasedOnRefreshRate(const bool) = 0;
         virtual float GetRefreshRate() const = 0;
         virtual float GetDefaultFixedTimestep() = 0;
-        virtual void SetDefaultFixedTimestep(const float&) = 0;
+        virtual void SetDefaultFixedTimestep(const float) = 0;
         virtual void ApplyDefaultFixedTimestep() const = 0;
         virtual bool GetVSync() = 0;
-        virtual void SetVSync(const bool&) = 0;
+        virtual void SetVSync(const bool) = 0;
         virtual int GetSysMaxFPS() = 0;
-        virtual void SetSysMaxFPS(const int&, const bool&) = 0;
+        virtual void SetSysMaxFPS(const int, const bool) = 0;
         virtual bool GetPhysicsEnabled() const = 0;
-        virtual void SetPhysicsEnabled(const bool&) = 0;
+        virtual void SetPhysicsEnabled(const bool) = 0;
         virtual bool GetPaused() const = 0;
-        virtual void SetPaused(const bool&) = 0;
+        virtual void SetPaused(const bool) = 0;
     };
 
     using TimeDistortionComponentRequestBus = AZ::EBus<TimeDistortionComponentRequests>;

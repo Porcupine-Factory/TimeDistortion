@@ -190,7 +190,7 @@ namespace TimeDistortion
     {
         return m_timeDistortionFactor;
     }
-    void TimeDistortionComponent::SetTimeDistortionFactor(const float& new_timeDistortionFactor)
+    void TimeDistortionComponent::SetTimeDistortionFactor(const float new_timeDistortionFactor)
     {
         if (new_timeDistortionFactor >= 0.f)
         {
@@ -218,7 +218,7 @@ namespace TimeDistortion
     {
         return m_timestepBasedOnRefreshRate;
     }
-    void TimeDistortionComponent::SetTimestepBasedOnRefreshRate(const bool& new_timestepBasedOnRefreshRate)
+    void TimeDistortionComponent::SetTimestepBasedOnRefreshRate(const bool new_timestepBasedOnRefreshRate)
     {
         m_timestepBasedOnRefreshRate = new_timestepBasedOnRefreshRate;
 
@@ -271,7 +271,7 @@ namespace TimeDistortion
 
         return m_defaultFixedTimestep;
     }
-    void TimeDistortionComponent::SetDefaultFixedTimestep(const float& new_defaultFixedTimestep)
+    void TimeDistortionComponent::SetDefaultFixedTimestep(const float new_defaultFixedTimestep)
     {
         m_defaultFixedTimestep = new_defaultFixedTimestep;
     }
@@ -306,7 +306,7 @@ namespace TimeDistortion
         else
             return m_vsync;
     }
-    void TimeDistortionComponent::SetVSync(const bool& new_vsync)
+    void TimeDistortionComponent::SetVSync(const bool new_vsync)
     {
         m_vsync = new_vsync;
         if (m_vsync)
@@ -326,7 +326,7 @@ namespace TimeDistortion
         else
             return 0;
     }
-    void TimeDistortionComponent::SetSysMaxFPS(const int& new_sysMaxFPS, const bool& setTimestepToo)
+    void TimeDistortionComponent::SetSysMaxFPS(const int new_sysMaxFPS, const bool setTimestepToo)
     {
         if (new_sysMaxFPS > 0)
         {
@@ -350,7 +350,7 @@ namespace TimeDistortion
     {
         return m_physicsEnabled;
     }
-    void TimeDistortionComponent::SetPhysicsEnabled(const bool& new_physicsEnabled)
+    void TimeDistortionComponent::SetPhysicsEnabled(const bool new_physicsEnabled)
     {
         m_physicsEnabled = new_physicsEnabled;
 
@@ -364,7 +364,7 @@ namespace TimeDistortion
     {
         return m_paused;
     }
-    void TimeDistortionComponent::SetPaused(const bool& new_paused)
+    void TimeDistortionComponent::SetPaused(const bool new_paused)
     {
         m_paused = new_paused;
 
