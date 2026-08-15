@@ -185,11 +185,6 @@ namespace TimeDistortion
         incompatible.push_back(AZ_CRC_CE("TimeDistortionService"));
     }
 
-    // Event Notification methods for use in scripts
-    void TimeDistortionComponent::OnTimeDistortionChanged()
-    {
-    }
-
     // Request Bus getter and setter methods for use in scripts
     float TimeDistortionComponent::GetTimeDistortionFactor() const
     {

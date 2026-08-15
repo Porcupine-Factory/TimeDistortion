@@ -42,9 +42,6 @@ namespace TimeDistortion
         void SetPaused(const bool& new_paused) override;
 
     private:
-        // TimeDistortionNotificationBus
-        void OnTimeDistortionChanged();
-
         // Time Distortion Factor
         float m_timeDistortionFactor = 0.5f;
 
