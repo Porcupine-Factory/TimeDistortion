@@ -190,12 +190,12 @@ namespace TimeDistortion
     {
         return m_timeDistortionFactor;
     }
-    void TimeDistortionComponent::SetTimeDistortionFactor(const float new_timeDistortionFactor)
+    void TimeDistortionComponent::SetTimeDistortionFactor(const float timeDistortionFactor)
     {
-        if (new_timeDistortionFactor >= 0.f)
+        if (timeDistortionFactor >= 0.f)
         {
             // Set the new time distortion factor
-            m_timeDistortionFactor = new_timeDistortionFactor;
+            m_timeDistortionFactor = timeDistortionFactor;
 
             // Apply the new time distortion factor
             if (auto* timeSystem = AZ::Interface<AZ::ITime>::Get())
@@ -218,9 +218,9 @@ namespace TimeDistortion
     {
         return m_timestepBasedOnRefreshRate;
     }
-    void TimeDistortionComponent::SetTimestepBasedOnRefreshRate(const bool new_timestepBasedOnRefreshRate)
+    void TimeDistortionComponent::SetTimestepBasedOnRefreshRate(const bool timestepBasedOnRefreshRate)
     {
-        m_timestepBasedOnRefreshRate = new_timestepBasedOnRefreshRate;
+        m_timestepBasedOnRefreshRate = timestepBasedOnRefreshRate;
 
         if (m_timestepBasedOnRefreshRate)
         {
@@ -271,9 +271,9 @@ namespace TimeDistortion
 
         return m_defaultFixedTimestep;
     }
-    void TimeDistortionComponent::SetDefaultFixedTimestep(const float new_defaultFixedTimestep)
+    void TimeDistortionComponent::SetDefaultFixedTimestep(const float defaultFixedTimestep)
     {
-        m_defaultFixedTimestep = new_defaultFixedTimestep;
+        m_defaultFixedTimestep = defaultFixedTimestep;
     }
     void TimeDistortionComponent::ApplyDefaultFixedTimestep() const
     {
@@ -306,9 +306,9 @@ namespace TimeDistortion
         else
             return m_vsync;
     }
-    void TimeDistortionComponent::SetVSync(const bool new_vsync)
+    void TimeDistortionComponent::SetVSync(const bool vsync)
     {
-        m_vsync = new_vsync;
+        m_vsync = vsync;
         if (m_vsync)
             AzFramework::ConsoleRequestBus::Broadcast(&AzFramework::ConsoleRequestBus::Events::ExecuteConsoleCommand, "vsync_interval 1");
         else
@@ -326,21 +326,20 @@ namespace TimeDistortion
         else
             return 0;
     }
-    void TimeDistortionComponent::SetSysMaxFPS(const int new_sysMaxFPS, const bool setTimestepToo)
+    void TimeDistortionComponent::SetSysMaxFPS(const int sysMaxFPS, const bool setTimestepToo)
     {
-        if (new_sysMaxFPS > 0)
+        if (sysMaxFPS > 0)
         {
-            m_sysMaxFPS = new_sysMaxFPS;
+            m_sysMaxFPS = sysMaxFPS;
             AzFramework::ConsoleRequestBus::Broadcast(
-                &AzFramework::ConsoleRequestBus::Events::ExecuteConsoleCommand,
-                (("sys_MaxFPS " + AZStd::to_string(new_sysMaxFPS))).c_str());
+                &AzFramework::ConsoleRequestBus::Events::ExecuteConsoleCommand, (("sys_MaxFPS " + AZStd::to_string(sysMaxFPS))).c_str());
             if (setTimestepToo)
             {
                 SetDefaultFixedTimestep(1.f / float(m_sysMaxFPS));
                 ApplyDefaultFixedTimestep();
             }
         }
-        else if (new_sysMaxFPS < 0)
+        else if (sysMaxFPS < 0)
         {
             m_sysMaxFPS = -1;
             AzFramework::ConsoleRequestBus::Broadcast(&AzFramework::ConsoleRequestBus::Events::ExecuteConsoleCommand, ("sys_MaxFPS -1"));
@@ -350,9 +349,9 @@ namespace TimeDistortion
     {
         return m_physicsEnabled;
     }
-    void TimeDistortionComponent::SetPhysicsEnabled(const bool new_physicsEnabled)
+    void TimeDistortionComponent::SetPhysicsEnabled(const bool physicsEnabled)
     {
-        m_physicsEnabled = new_physicsEnabled;
+        m_physicsEnabled = physicsEnabled;
 
         AzPhysics::SceneHandle sceneHandle;
         Physics::DefaultWorldBus::BroadcastResult(sceneHandle, &Physics::DefaultWorldRequests::GetDefaultSceneHandle);
@@ -364,9 +363,9 @@ namespace TimeDistortion
     {
         return m_paused;
     }
-    void TimeDistortionComponent::SetPaused(const bool new_paused)
+    void TimeDistortionComponent::SetPaused(const bool paused)
     {
-        m_paused = new_paused;
+        m_paused = paused;
 
         if (m_paused)
         {

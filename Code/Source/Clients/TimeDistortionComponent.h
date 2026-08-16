@@ -25,21 +25,21 @@ namespace TimeDistortion
 
         // TimeDistortionRequestBus
         float GetTimeDistortionFactor() const override;
-        void SetTimeDistortionFactor(const float new_timeDistortionFactor) override;
+        void SetTimeDistortionFactor(const float timeDistortionFactor) override;
         bool GetTimestepBasedOnRefreshRate() const override;
-        void SetTimestepBasedOnRefreshRate(const bool new_timestepBasedOnRefreshRate) override;
+        void SetTimestepBasedOnRefreshRate(const bool timestepBasedOnRefreshRate) override;
         float GetRefreshRate() const override;
         float GetDefaultFixedTimestep() override;
-        void SetDefaultFixedTimestep(const float new_defaultFixedTimestep) override;
+        void SetDefaultFixedTimestep(const float defaultFixedTimestep) override;
         void ApplyDefaultFixedTimestep() const override;
         bool GetVSync() override;
-        void SetVSync(const bool new_vsync) override;
+        void SetVSync(const bool vsync) override;
         int GetSysMaxFPS() override;
-        void SetSysMaxFPS(const int new_sysMaxFPS, const bool setTimestepToo) override;
+        void SetSysMaxFPS(const int sysMaxFPS, const bool setTimestepToo) override;
         bool GetPhysicsEnabled() const override;
-        void SetPhysicsEnabled(const bool new_physicsEnabled) override;
+        void SetPhysicsEnabled(const bool physicsEnabled) override;
         bool GetPaused() const override;
-        void SetPaused(const bool new_paused) override;
+        void SetPaused(const bool paused) override;
 
     private:
         // Time Distortion Factor
