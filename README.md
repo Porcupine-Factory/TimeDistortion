@@ -1,5 +1,7 @@
 # TimeDistortion
-O3DE Time Distortion Gem licensed under the [Expat license](/LICENSE.txt).
+The Time Distortion Gem gives you the ability to speed up or slow down the perceived time.
+
+O3DE Time Distortion Gem is licensed under the [Expat license](/LICENSE.txt).
 
 ## Installation Instructions
 You can install this gem in your project using O3DE's project manager. Navigate to the Gem Repositories page and provide this repo's git URL.
